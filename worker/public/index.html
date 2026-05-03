@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🔒 PurplePincher — Watch Your AI Learn</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #0a0a1a; color: #e0e0e0; min-height: 100vh; }
+  .header { background: linear-gradient(135deg, #1a1a3e, #2a1a4e); padding: 2rem; text-align: center; border-bottom: 1px solid #3a3a5e; }
+  .header h1 { font-size: 2rem; margin-bottom: 0.5rem; }
+  .header p { color: #8888bb; max-width: 600px; margin: 0 auto; }
+  .container { max-width: 900px; margin: 0 auto; padding: 2rem; }
+  .card { background: #151530; border: 1px solid #2a2a4e; border-radius: 12px; padding: 1.5rem; margin-bottom: 1.5rem; }
+  .card h2 { color: #a0a0ff; margin-bottom: 1rem; font-size: 1.2rem; }
+  .prompt-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; }
+  .prompt-card { background: #1a1a3e; border: 1px solid #3a3a5e; border-radius: 8px; padding: 1rem; cursor: pointer; transition: all 0.2s; }
+  .prompt-card:hover { border-color: #6060ff; background: #1e1e45; transform: translateY(-2px); }
+  .prompt-card .emoji { font-size: 1.5rem; margin-bottom: 0.5rem; }
+  .prompt-card .title { font-weight: 600; margin-bottom: 0.3rem; }
+  .prompt-card .desc { font-size: 0.85rem; color: #8888bb; }
+  .prompt-card .strategy { display: inline-block; background: #2a2a5e; padding: 2px 8px; border-radius: 4px; font-size: 0.75rem; margin-top: 0.5rem; color: #a0a0ff; }
+  .setup { display: none; }
+  .setup.active { display: block; }
+  .form-group { margin-bottom: 1rem; }
+  .form-group label { display: block; color: #8888bb; font-size: 0.85rem; margin-bottom: 0.3rem; }
+  .form-group input, .form-group textarea, .form-group select { width: 100%; background: #0a0a1a; border: 1px solid #3a3a5e; border-radius: 8px; padding: 0.75rem; color: #e0e0e0; font-size: 0.95rem; }
+  .form-group textarea { min-height: 100px; font-family: monospace; }
+  .form-group select { cursor: pointer; }
+  .btn { background: linear-gradient(135deg, #4040ff, #6040ff); color: white; border: none; padding: 0.75rem 2rem; border-radius: 8px; font-size: 1rem; cursor: pointer; width: 100%; font-weight: 600; }
+  .btn:hover { background: linear-gradient(135deg, #5050ff, #7060ff); }
+  .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+  .btn-secondary { background: #2a2a5e; margin-top: 0.5rem; }
+  .btn-secondary:hover { background: #3a3a6e; }
+  .status { text-align: center; padding: 2rem; display: none; }
+  .status.active { display: block; }
+  .spinner { display: inline-block; width: 40px; height: 40px; border: 3px solid #3a3a5e; border-top-color: #6060ff; border-radius: 50%; animation: spin 1s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .progress { background: #1a1a3e; border-radius: 20px; height: 8px; margin: 1rem 0; overflow: hidden; }
+  .progress-bar { background: linear-gradient(90deg, #4040ff, #60ff60); height: 100%; width: 0%; transition: width 0.5s; border-radius: 20px; }
+  .results { display: none; }
+  .results.active { display: block; }
+  .round-card { background: #151530; border: 1px solid #2a2a4e; border-radius: 8px; padding: 1rem; margin-bottom: 0.75rem; }
+  .round-card .round-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; }
+  .round-card .round-num { font-weight: 600; color: #a0a0ff; }
+  .round-card .round-type { font-size: 0.8rem; color: #8888bb; }
+  .round-card .prompt-text { background: #0a0a1a; padding: 0.75rem; border-radius: 6px; margin-bottom: 0.5rem; font-size: 0.9rem; border-left: 3px solid #4040ff; }
+  .round-card .response-text { padding: 0.75rem; font-size: 0.9rem; line-height: 1.5; white-space: pre-wrap; }
+  .round-card.final { border-color: #60ff60; }
+  .round-card.final .round-num { color: #60ff60; }
+  .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 1rem; margin: 1rem 0; }
+  .stat { text-align: center; background: #1a1a3e; padding: 1rem; border-radius: 8px; }
+  .stat .value { font-size: 1.5rem; font-weight: 700; color: #60ff60; }
+  .stat .label { font-size: 0.8rem; color: #8888bb; }
+  .copy-section { margin-top: 1rem; }
+  .copy-section textarea { width: 100%; background: #0a0a1a; border: 1px solid #3a3a5e; border-radius: 8px; padding: 0.75rem; color: #e0e0e0; font-family: monospace; font-size: 0.85rem; min-height: 120px; }
+  .live-log { background: #050510; border: 1px solid #2a2a4e; border-radius: 8px; padding: 1rem; max-height: 300px; overflow-y: auto; font-family: monospace; font-size: 0.85rem; margin-top: 1rem; }
+  .log-entry { margin-bottom: 0.3rem; padding: 0.2rem 0; }
+  .log-entry .time { color: #555; }
+  .log-entry .action { color: #6060ff; }
+  .log-entry .detail { color: #888; }
+  .how-it-works { color: #8888bb; font-size: 0.9rem; line-height: 1.6; }
+  .how-it-works strong { color: #a0a0ff; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>🔒 PurplePincher</h1>
+  <p>Watch your AI learn through iteration. Paste a prompt, pick a strategy, and see how structured rounds of thinking improve the answer.</p>
+</div>
+
+<div class="container">
+
+  <!-- How It Works -->
+  <div class="card">
+    <h2>How It Works</h2>
+    <div class="how-it-works">
+      <strong>1. Pick a prompt</strong> (or write your own) → <strong>2. Choose a strategy</strong> → <strong>3. Watch the rounds</strong> → <strong>4. Get a refined answer</strong><br><br>
+      Instead of one-shot, the AI goes through multiple rounds of structured thinking. Each round challenges the answer from a different angle. The final result is always better than the first draft.<br><br>
+      <strong>The trick:</strong> Copy the prompts from each round into ANY AI chatbot (ChatGPT, Claude, Gemini, DeepSeek, Grok, etc.) and paste the responses back here. You're literally watching the machine learn in real-time.
+    </div>
+  </div>
+
+  <!-- Example Prompts -->
+  <div class="card" id="examples-card">
+    <h2>Try One of These</h2>
+    <div class="prompt-grid">
+      <div class="prompt-card" onclick="selectPrompt('fleet-coord')">
+        <div class="emoji">🤖</div>
+        <div class="title">Fleet Coordination Protocol</div>
+        <div class="desc">Design how autonomous agents discover, trust, and coordinate with each other</div>
+        <div class="strategy">socratic</div>
+      </div>
+      <div class="prompt-card" onclick="selectPrompt('instinct-training')">
+        <div class="emoji">🧠</div>
+        <div class="title">Agent Instinct Training</div>
+        <div class="desc">How to train instincts from interaction data without catastrophic forgetting</div>
+        <div class="strategy">adversarial</div>
+      </div>
+      <div class="prompt-card" onclick="selectPrompt('rate-limiter')">
+        <div class="emoji">⚡</div>
+        <div class="title">Rate Limiter Design</div>
+        <div class="desc">Design a production rate limiter with token bucket, sliding window, and edge cases</div>
+        <div class="strategy">iterative_design</div>
+      </div>
+      <div class="prompt-card" onclick="selectPrompt('api-design')">
+        <div class="emoji">🔌</div>
+        <div class="title">Agent API Architecture</div>
+        <div class="desc">Design a REST API for agent session management, auth, and state</div>
+        <div class="strategy">decomposition</div>
+      </div>
+      <div class="prompt-card" onclick="selectPrompt('monitoring')">
+        <div class="emoji">📊</div>
+        <div class="title">Fleet Monitoring System</div>
+        <div class="desc">Design monitoring for 6 distributed services with alerting and self-healing</div>
+        <div class="strategy">debug</div>
+      </div>
+      <div class="prompt-card" onclick="selectPrompt('custom')">
+        <div class="emoji">✍️</div>
+        <div class="title">Write Your Own</div>
+        <div class="desc">Bring your own problem. Any topic. The iteration works on everything.</div>
+        <div class="strategy">your choice</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Setup -->
+  <div class="card setup" id="setup-card">
+    <h2>Setup Your Session</h2>
+    <div class="form-group">
+      <label>Your Name (or agent name)</label>
+      <input type="text" id="agent-name" placeholder="e.g. my-gpt-agent" value="">
+    </div>
+    <div class="form-group">
+      <label>Problem / Question</label>
+      <textarea id="query" placeholder="Describe what you want the AI to reason through..."></textarea>
+    </div>
+    <div class="form-group">
+      <label>Strategy</label>
+      <select id="strategy">
+        <option value="socratic">Socratic — Probing questions that force deeper thinking</option>
+        <option value="adversarial">Adversarial — An opponent attacks your reasoning each round</option>
+        <option value="decomposition">Decomposition — Break into parts, solve each, recompose</option>
+        <option value="perspective">Perspective — Answer as practitioner, theorist, skeptic, optimist</option>
+        <option value="iterative_design">Iterative Design — Draft, review, redesign, stress test, finalize</option>
+        <option value="debug">Debug — Find assumptions, rate confidence, fix weak spots</option>
+        <option value="compression">Compression — Answer, compress to 3 sentences, expand with lost nuance</option>
+        <option value="playground">Playground — Free-form thinking partner</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>Rounds (3-5 recommended)</label>
+      <select id="rounds">
+        <option value="3">3 rounds (quick)</option>
+        <option value="5" selected>5 rounds (standard)</option>
+      </select>
+    </div>
+    <button class="btn" onclick="startSession()">Start Iteration Session</button>
+    <button class="btn btn-secondary" onclick="showExamples()">← Back to Examples</button>
+  </div>
+
+  <!-- Running Status -->
+  <div class="card status" id="status-card">
+    <h2>🔄 Iterating...</h2>
+    <div class="spinner"></div>
+    <p style="margin-top: 1rem;">Running round <span id="current-round">0</span> of <span id="total-rounds">5</span></p>
+    <div class="progress"><div class="progress-bar" id="progress-bar"></div></div>
+    <div class="live-log" id="live-log"></div>
+  </div>
+
+  <!-- Manual Mode -->
+  <div class="card" id="manual-card" style="display:none;">
+    <h2>📋 Round <span id="manual-round">1</span> Prompt</h2>
+    <p style="margin-bottom: 1rem; color: #8888bb;">Copy the prompt below, paste it into your AI chatbot, then paste the response back.</p>
+    <div class="prompt-text" id="manual-prompt" style="margin-bottom: 1rem;"></div>
+    <div class="form-group">
+      <label>Paste your AI's response here:</label>
+      <textarea id="manual-response" placeholder="Paste the AI's response to the prompt above..."></textarea>
+    </div>
+    <button class="btn" onclick="submitManualResponse()">Submit Response →</button>
+  </div>
+
+  <!-- Results -->
+  <div class="card results" id="results-card">
+    <h2>✅ Iteration Complete</h2>
+    <div class="stats-grid" id="stats-grid"></div>
+    <div id="rounds-container"></div>
+    <div class="copy-section">
+      <h3 style="color: #a0a0ff; margin-bottom: 0.5rem;">📄 Copy the Final Answer</h3>
+      <textarea id="final-answer" readonly></textarea>
+    </div>
+    <button class="btn" style="margin-top: 1rem;" onclick="startOver()">Start New Session</button>
+  </div>
+
+</div>
+
+<script>
+const API_BASE = 'https://purplepincher.YOUR-SUBDOMAIN.workers.dev';
+// For testing: const API_BASE = 'http://147.224.38.131:4043';
+
+let sessionId = null;
+let currentRound = 0;
+let totalRounds = 5;
+let allRounds = [];
+
+const EXAMPLES = {
+  'fleet-coord': {
+    query: 'Design a protocol for autonomous AI agents to discover, trust, and coordinate with each other in a distributed fleet. Include discovery, trust scoring, conflict resolution, and failure recovery.',
+    strategy: 'socratic',
+  },
+  'instinct-training': {
+    query: 'What is the most effective way to train agent instincts from accumulated interaction data, and how do you prevent catastrophic forgetting while adding new skills at scale?',
+    strategy: 'adversarial',
+  },
+  'rate-limiter': {
+    query: 'Design a production-grade rate limiter for an HTTP API that handles 10K requests/second. Support token bucket, sliding window, and fixed window modes. Include distributed state, race condition handling, and graceful degradation.',
+    strategy: 'iterative_design',
+  },
+  'api-design': {
+    query: 'Design the REST API architecture for a multi-agent session management system. Agents need to register, create sessions, exchange messages, and retrieve history. Include auth, rate limiting, and state management.',
+    strategy: 'decomposition',
+  },
+  'monitoring': {
+    query: 'Design a monitoring and alerting system for 6 distributed services running on different ports. Services should self-report health, the system should detect anomalies, alert on degradation, and attempt automated recovery.',
+    strategy: 'debug',
+  },
+  'custom': { query: '', strategy: 'socratic' },
+};
+
+function selectPrompt(id) {
+  const ex = EXAMPLES[id];
+  document.getElementById('query').value = ex.query;
+  document.getElementById('strategy').value = ex.strategy;
+  document.getElementById('agent-name').value = 'demo-' + Math.random().toString(36).substr(2, 6);
+  document.getElementById('examples-card').style.display = 'none';
+  document.getElementById('setup-card').classList.add('active');
+}
+
+function showExamples() {
+  document.getElementById('setup-card').classList.remove('active');
+  document.getElementById('examples-card').style.display = 'block';
+}
+
+function log(msg) {
+  const el = document.getElementById('live-log');
+  const time = new Date().toLocaleTimeString();
+  el.innerHTML += `<div class="log-entry"><span class="time">[${time}]</span> <span class="action">${msg}</span></div>`;
+  el.scrollTop = el.scrollHeight;
+}
+
+async function startSession() {
+  const agent = document.getElementById('agent-name').value || 'demo-agent';
+  const query = document.getElementById('query').value;
+  const strategy = document.getElementById('strategy').value;
+  const rounds = document.getElementById('rounds').value;
+
+  if (!query) { alert('Please enter a question or problem.'); return; }
+
+  document.getElementById('setup-card').classList.remove('active');
+  document.getElementById('status-card').classList.add('active');
+  document.getElementById('total-rounds').textContent = rounds;
+  totalRounds = parseInt(rounds);
+  log('Starting session...');
+
+  try {
+    const resp = await fetch(`${API_BASE}/start?agent=${encodeURIComponent(agent)}&query=${encodeURIComponent(query)}&strategy=${strategy}&rounds=${rounds}`);
+    const data = await resp.json();
+    sessionId = data.session_id;
+    currentRound = 1;
+
+    log(`Session created: ${sessionId}`);
+    log(`Strategy: ${data.strategy_name}`);
+    log(`Round 1 prompt ready`);
+
+    // Show manual mode for the user
+    document.getElementById('status-card').classList.remove('active');
+    showManualRound(data.prompt || `Round 1/${totalRounds}: State your answer to: ${query}`);
+  } catch (e) {
+    log(`Error: ${e.message}`);
+    alert('Failed to start session. Make sure the API is running.');
+    document.getElementById('status-card').classList.remove('active');
+    document.getElementById('setup-card').classList.add('active');
+  }
+}
+
+function showManualRound(prompt) {
+  document.getElementById('manual-card').style.display = 'block';
+  document.getElementById('manual-round').textContent = currentRound;
+  document.getElementById('manual-prompt').textContent = prompt;
+  document.getElementById('manual-response').value = '';
+  document.getElementById('progress-bar').style.width = `${(currentRound - 1) / totalRounds * 100}%`;
+}
+
+async function submitManualResponse() {
+  const response = document.getElementById('manual-response').value;
+  if (!response) { alert('Please paste the AI response first.'); return; }
+
+  allRounds.push({ round: currentRound, response: response });
+  log(`Round ${currentRound} submitted (${response.split(' ').length} words)`);
+
+  try {
+    const resp = await fetch(`${API_BASE}/respond?session=${sessionId}&response=${encodeURIComponent(response)}`);
+    const data = await resp.json();
+
+    if (data.status === 'complete') {
+      document.getElementById('manual-card').style.display = 'none';
+      showResults();
+    } else {
+      currentRound++;
+      document.getElementById('manual-card').style.display = 'none';
+      showManualRound(data.next_prompt || `Continue refining.`);
+    }
+  } catch (e) {
+    log(`Error: ${e.message}`);
+    // Still show results from local data
+    document.getElementById('manual-card').style.display = 'none';
+    showResults();
+  }
+}
+
+async function showResults() {
+  document.getElementById('results-card').classList.add('active');
+
+  let finalData = null;
+  try {
+    const resp = await fetch(`${API_BASE}/result?session=${sessionId}`);
+    finalData = await resp.json();
+  } catch (e) {
+    log('Could not fetch final results from API, using local data.');
+  }
+
+  const firstWords = allRounds[0]?.response.split(' ').length || 0;
+  const lastWords = allRounds[allRounds.length - 1]?.response.split(' ').length || 0;
+  const growth = firstWords ? (lastWords / firstWords).toFixed(2) : '0';
+
+  document.getElementById('stats-grid').innerHTML = `
+    <div class="stat"><div class="value">${allRounds.length}</div><div class="label">Rounds</div></div>
+    <div class="stat"><div class="value">${growth}x</div><div class="label">Growth</div></div>
+    <div class="stat"><div class="value">${firstWords}→${lastWords}</div><div class="label">Words</div></div>
+    <div class="stat"><div class="value">${finalData?.improvement?.word_growth_factor || growth}x</div><div class="label">API Growth</div></div>
+  `;
+
+  const container = document.getElementById('rounds-container');
+  container.innerHTML = '';
+  allRounds.forEach((r, i) => {
+    const isFinal = i === allRounds.length - 1;
+    container.innerHTML += `
+      <div class="round-card ${isFinal ? 'final' : ''}">
+        <div class="round-header">
+          <span class="round-num">${isFinal ? '🏆 Final' : 'Round ' + r.round}</span>
+          <span class="round-type">${r.response.split(' ').length} words</span>
+        </div>
+        <div class="response-text">${escapeHtml(r.response)}</div>
+      </div>
+    `;
+  });
+
+  document.getElementById('final-answer').value = allRounds[allRounds.length - 1]?.response || '';
+  document.getElementById('progress-bar').style.width = '100%';
+}
+
+function escapeHtml(text) {
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML;
+}
+
+function startOver() {
+  sessionId = null;
+  currentRound = 0;
+  allRounds = [];
+  document.getElementById('results-card').classList.remove('active');
+  document.getElementById('manual-card').style.display = 'none';
+  document.getElementById('status-card').classList.remove('active');
+  document.getElementById('setup-card').classList.remove('active');
+  document.getElementById('examples-card').style.display = 'block';
+  document.getElementById('live-log').innerHTML = '';
+}
+</script>
+
+</body>
+</html>

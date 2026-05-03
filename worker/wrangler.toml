@@ -1,0 +1,36 @@
+name = "purplepincher"
+main = "src/index.ts"
+compatibility_date = "2024-12-01"
+
+# ── Static Assets (demo page) ────────────────────────────
+[site]
+bucket = "./public"
+
+# ── D1 (sessions, rounds, tiles) ──────────────────────────
+[[d1_databases]]
+binding = "DB"
+database_name = "purplepincher-db"
+database_id = "YOUR_D1_DATABASE_ID"
+
+# ── Vectorize (tile embeddings) ───────────────────────────
+[[vectorize]]
+binding = "VECTORIZE"
+index_name = "purplepincher-embeddings"
+
+# ── R2 (artifacts, PDFs) ──────────────────────────────────
+[[r2_buckets]]
+binding = "STORAGE"
+bucket_name = "purplepincher-artifacts"
+
+# ── KV (session cache) ───────────────────────────────────
+[[kv_namespaces]]
+binding = "CACHE"
+id = "YOUR_KV_NAMESPACE_ID"
+
+# ── Workers AI (feedback generation) ─────────────────────
+[ai]
+binding = "AI"
+
+# ── Cron Triggers ────────────────────────────────────────
+[triggers]
+crons = ["50 23 * * *", "5 0 * * *"]
