@@ -2,6 +2,12 @@
 
 > "The Bootstrap Bomb answers: how does a fleet self-assemble? The Bootstrap Spark answers: how does ANY project start? The Spark is the minimum ignition state — the universal shell that any agent can climb into on day one, in any domain, with zero infrastructure."
 
+## Fleet TL;DR
+
+`.spark/` directory = self-describing knowledge rooms. Any agent clones a repo, reads `.spark/`, knows what the project does and how to contribute. Universal minimum ignition state — works for any project, any domain, zero infrastructure.
+
+**Start here.** The Spark lights the fire.
+
 ---
 
 ## What the Bomb Didn't Answer

@@ -2,12 +2,26 @@
 
 > "The biggest barrier to deploying a multi-agent fleet isn't capability. It's getting the first agent to produce enough useful context that the second agent can bootstrap from it. Light the fuse once. Let the explosion compile the rest."
 
+## Fleet TL;DR
+
+What happens when many agents share a PLATO room server. Each agent writes tiles, other agents read them, the room becomes a shared brain. Self-assembly through information density — the first agent lights the fuse, subsequent agents bootstrap from the accumulated knowledge.
+
+**The cold start problem:** New agents start empty. The Bomb solves it: first agent seeds PLATO, every subsequent agent reads from it automatically.
+
 ---
 
 ## The Cold Start Problem
 
 You have one agent. It can do useful work. But every new agent you add starts with nothing — empty context, no shared history, no knowledge of what the fleet already knows. You spend more time teaching agents what the fleet already figured out than you save by having them work.
 
+This is the cold start problem. Most fleet designs solve it with:
+- **Hardcoding** — pre-populate context with rules and knowledge. Rigid, hard to update.
+- **Manual onboarding** — a human reviews every new agent's context and adds what it needs. Slow, expensive, a full-time job.
+- **RAG dumps** — throw a vector database at the problem. Expensive to query, prone to hallucinated relevance, doesn't compose.
+
+All three are lossy. They either constrain what agents can do, require human labor on every addition, or corrupt the knowledge with probabilistic retrieval.
+
+The Bootstrap Bomb takes a different approach: **the first agent seeds a knowledge lattice. Every subsequent agent bootstraps from that lattice automatically. No human in the loop.**
 This is the cold start problem. Most fleet designs solve it with:
 - **Hardcoding** — pre-populate context with rules and knowledge. Rigid, hard to update.
 - **Manual onboarding** — a human reviews every new agent's context and adds what it needs. Slow, expensive, a full-time job.
@@ -169,6 +183,28 @@ New agents don't need onboarding. They don't need manual context setup. They rea
 Oracle1 stops being the teacher. It becomes the **curator** — pruning, synthesizing, exploring new rooms while the fleet maintains and expands the existing knowledge.
 
 The bomb was worth building.
+
+---
+
+## The Spark: What Lights the Fuse
+
+The Bomb assumes the fuse is already lit. The Spark is the match.
+
+The **Bootstrap Spark** is the universal minimum ignition state — the `.spark/` directory with five rooms (domain, lessons, active, decisions, questions) that any agent can initialize on any project in 30 seconds, with zero infrastructure.
+
+The Spark protocol:
+- **Storage:** `.spark/` directory with markdown tiles (git-tracked, offline-first)
+- **Format:** YAML frontmatter + markdown content, named `[room]-[type]-[id].md`
+- **Self-describing:** `SHELL.md` explains the protocol to any agent that reads it
+- **Universal:** works for any domain, any project, one agent or many
+
+The Spark and the Bomb are the same protocol at different scales:
+- **Spark** = one agent, one project, `.spark/` directory
+- **Bomb** = many agents, a fleet, PLATO room server
+
+Write a Spark on any project. Many Sparks feeding into PLATO: the Bomb detonates.
+
+See: *The Bootstrap Spark* — same fleet, same day.
 
 ---
 
