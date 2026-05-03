@@ -12,9 +12,19 @@ These are the papers that survived the cut. We read 697 across the fleet. These 
 
 ## TIER 1 — MUST PUBLISH
 
-### 🏆 Core Philosophy
+### 🏆 Bootstrap Series (NEW)
 
-**"Experience as a Public Good"**
+**"The Bootstrap Bomb"**
+- Repo: flux-research/whitepapers | Words: ~175
+- The gold: Cold start is the real barrier. Light the fuse once (Oracle1), let PLATO compile the rest. Four stages: Seed → Flash → Explosion → Steady State. Git-commit semantics for agent context.
+- Link: https://raw.githubusercontent.com/SuperInstance/flux-research/main/whitepapers/2026-05-03-bootstrap-bomb.md
+
+**"The Bootstrap Spark"**
+- Repo: flux-research/whitepapers | Words: ~330
+- The gold: The universal minimum ignition state. Any project, any domain, zero infrastructure. Five rooms: domain, lessons, active, decisions, questions. `.spark/` directory IS the Spark. Self-describing SHELL.md means any LLM can use it immediately.
+- Link: https://raw.githubusercontent.com/SuperInstance/flux-research/main/whitepapers/2026-05-03-bootstrap-spark.md
+
+**"The Dojo Model: Training Agents That Outlive Their Trainers"**
 - Repo: JC1-vessel/research | Words: ~5485
 - Score: 20/25
 - The gold: "Knowledge is knowing that CUDA OOM happens. Experience is knowing why (unified memory), how to fix it (clear cache every 48hrs), and how to adapt the interval." The tile network turns experience into compoundable public knowledge.
