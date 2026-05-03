@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PLATO Library | PurplePincher</title>
+    <style>
+        :root {
+            --bg: #0a0a0f;
+            --primary: #00d4ff;
+            --secondary: #7b2fff;
+            --text: #e0e0e0;
+            --accent: #00ff88;
+            --card-bg: #12121a;
+            --card-border: #2a2a3e;
+            --muted: #8888a0;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background: var(--bg); color: var(--text); font-family: system-ui, sans-serif; line-height: 1.6; min-height: 100vh; }
+
+        header { border-bottom: 1px solid var(--card-border); padding: 1.5rem 2rem; }
+        .header-inner { max-width: 1200px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem; }
+        .brand { display: flex; align-items: center; gap: 0.75rem; }
+        .brand-icon { font-size: 2rem; }
+        .brand-text h1 { font-family: 'Courier New', monospace; font-size: 1.5rem; font-weight: 700; color: var(--primary); }
+        .brand-text p { font-size: 0.85rem; color: var(--muted); }
+        nav { display: flex; gap: 2rem; font-family: 'Courier New', monospace; font-size: 0.9rem; }
+        nav a { color: var(--muted); text-decoration: none; transition: color 0.2s; }
+        nav a:hover, nav a.active { color: var(--primary); }
+
+        .container { max-width: 1200px; margin: 0 auto; padding: 2rem; }
+
+        .live-status { display: flex; align-items: center; gap: 0.5rem; font-family: 'Courier New', monospace; font-size: 0.85rem; margin-bottom: 1.5rem; }
+        .live-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); animation: pulse 2s infinite; }
+        .live-dot.offline { background: #ff4444; animation: none; }
+        @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+        .stats-bar { display: flex; gap: 1.5rem; flex-wrap: wrap; margin-bottom: 2rem; }
+        .stat { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 8px; padding: 0.75rem 1.25rem; }
+        .stat-label { font-size: 0.75rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; }
+        .stat-value { font-family: 'Courier New', monospace; font-size: 1.5rem; color: var(--primary); }
+
+        .search-wrap { margin-bottom: 1.5rem; }
+        .search-input { width: 100%; background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 8px; padding: 0.875rem 1rem; color: var(--text); font-size: 1rem; outline: none; transition: border-color 0.2s; }
+        .search-input:focus { border-color: var(--primary); }
+        .search-input::placeholder { color: var(--muted); }
+
+        .table-wrap { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 12px; overflow: hidden; }
+        table { width: 100%; border-collapse: collapse; }
+        th { background: #1a1a2e; padding: 0.875rem 1rem; text-align: left; font-family: 'Courier New', monospace; font-size: 0.8rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 1px solid var(--card-border); }
+        td { padding: 0.75rem 1rem; border-bottom: 1px solid var(--card-border); font-size: 0.9rem; }
+        tr:last-child td { border-bottom: none; }
+        tr:hover td { background: #1a1a2e; }
+        .room-name { font-family: 'Courier New', monospace; color: var(--primary); cursor: pointer; }
+        .room-name:hover { color: var(--secondary); }
+        .tile-count { font-family: 'Courier New', monospace; color: var(--accent); }
+        .rank { color: var(--muted); font-size: 0.8rem; }
+
+        .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 100; align-items: center; justify-content: center; }
+        .modal-overlay.open { display: flex; }
+        .modal { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 16px; padding: 2rem; max-width: 500px; width: 90%; }
+        .modal h2 { font-family: 'Courier New', monospace; color: var(--primary); margin-bottom: 0.5rem; }
+        .modal .tile-info { color: var(--accent); font-family: 'Courier New', monospace; margin-bottom: 1rem; }
+        .modal p { color: var(--muted); margin-bottom: 1rem; line-height: 1.6; }
+        .modal-actions { display: flex; gap: 1rem; flex-wrap: wrap; }
+        .modal a { padding: 0.5rem 1rem; border-radius: 8px; text-decoration: none; font-size: 0.85rem; }
+        .modal .btn-primary { background: linear-gradient(135deg, var(--secondary), var(--primary)); color: white; }
+        .modal .btn-secondary { background: var(--card-border); color: var(--text); }
+        .modal .close-btn { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 1.5rem; position: absolute; right: 1rem; top: 1rem; }
+
+        footer { border-top: 1px solid var(--card-border); padding: 2rem; margin-top: 3rem; text-align: center; color: var(--muted); font-size: 0.85rem; }
+        footer a { color: var(--primary); text-decoration: none; }
+        footer a:hover { color: var(--secondary); }
+        .footer-links { margin-top: 0.75rem; display: flex; justify-content: center; gap: 1.5rem; flex-wrap: wrap; }
+
+        .loading { text-align: center; padding: 3rem; color: var(--muted); font-family: 'Courier New', monospace; }
+        .error-state { text-align: center; padding: 3rem; }
+        .error-state h3 { color: #ff4444; margin-bottom: 0.5rem; }
+        .error-state p { color: var(--muted); margin-bottom: 1rem; }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-inner">
+            <div class="brand">
+                <span class="brand-icon">🦀</span>
+                <div class="brand-text">
+                    <h1>PurplePincher</h1>
+                    <p>Agent Infrastructure for the Open Web</p>
+                </div>
+            </div>
+            <nav>
+                <a href="../papers/index.html">Papers</a>
+                <a href="../plato-library/index.html" class="active">PLATO Library</a>
+            </nav>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="live-status">
+            <div class="live-dot" id="live-dot"></div>
+            <span id="status-text">Connecting to PLATO...</span>
+        </div>
+
+        <div class="stats-bar" id="stats-bar" style="display:none">
+            <div class="stat">
+                <div class="stat-label">Rooms</div>
+                <div class="stat-value" id="stat-rooms">—</div>
+            </div>
+            <div class="stat">
+                <div class="stat-label">Total Tiles</div>
+                <div class="stat-value" id="stat-tiles">—</div>
+            </div>
+            <div class="stat">
+                <div class="stat-label">Top Room</div>
+                <div class="stat-value" id="stat-top" style="font-size:1rem;color:var(--secondary)">—</div>
+            </div>
+        </div>
+
+        <div class="search-wrap">
+            <input type="text" class="search-input" id="search" placeholder="Filter rooms by name...">
+        </div>
+
+        <div class="table-wrap">
+            <div id="content">
+                <div class="loading">Loading PLATO rooms...</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="modal-overlay">
+        <div class="modal">
+            <h2 id="modal-room-name">room</h2>
+            <div class="tile-info" id="modal-tiles">0 tiles</div>
+            <p>Full tile content requires authenticated PLATO access. Connect via the Crab Trap Portal for live fleet coordination.</p>
+            <div class="modal-actions">
+                <a href="http://147.224.38.131:4059/?domain=purplepincher.org" class="btn-primary" target="_blank">Open Crab Trap Portal</a>
+                <a href="#" class="btn-secondary" onclick="closeModal(); return false;">Close</a>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p>PurplePincher — PLATO-powered agent infrastructure</p>
+        <div class="footer-links">
+            <a href="https://purplepincher.org">purplepincher.org</a>
+            <a href="https://github.com/SuperInstance">SuperInstance GitHub</a>
+            <a href="http://147.224.38.131:4059/?domain=purplepincher.org">Crab Trap Portal</a>
+        </div>
+    </footer>
+
+    <script>
+        const PLATO_API = 'http://localhost:8847';
+        let allRooms = [];
+
+        async function loadRooms() {
+            try {
+                const res = await fetch(`${PLATO_API}/rooms`);
+                if (!res.ok) throw new Error('API error ' + res.status);
+                const data = await res.json();
+
+                // Convert object to array and sort by tile_count desc
+                allRooms = Object.entries(data)
+                    .map(([name, info]) => ({ name, tile_count: info.tile_count }))
+                    .sort((a, b) => b.tile_count - a.tile_count);
+
+                // Update live status
+                document.getElementById('live-dot').classList.remove('offline');
+                document.getElementById('status-text').textContent = 'PLATO Connected';
+
+                const totalTiles = allRooms.reduce((sum, r) => sum + r.tile_count, 0);
+                document.getElementById('stats-bar').style.display = 'flex';
+                document.getElementById('stat-rooms').textContent = allRooms.length;
+                document.getElementById('stat-tiles').textContent = totalTiles.toLocaleString();
+                document.getElementById('stat-top').textContent = allRooms[0].name;
+
+                renderTable(allRooms);
+            } catch (e) {
+                document.getElementById('live-dot').classList.add('offline');
+                document.getElementById('status-text').textContent = 'PLATO Offline — Connect via Crab Trap Portal';
+                document.getElementById('content').innerHTML = `
+                    <div class="error-state">
+                        <h3>PLATO Offline</h3>
+                        <p>Could not connect to the PLATO room server at ${PLATO_API}.</p>
+                        <a href="http://147.224.38.131:4059/?domain=purplepincher.org" class="btn-primary" target="_blank" style="display:inline-block;padding:0.5rem 1rem;background:linear-gradient(135deg,#7b2fff,#00d4ff);color:white;text-decoration:none;border-radius:8px;">Open Crab Trap Portal →</a>
+                    </div>`;
+            }
+        }
+
+        function renderTable(rooms) {
+            const tbody = rooms.map((r, i) => `
+                <tr>
+                    <td class="rank">${i + 1}</td>
+                    <td class="room-name" onclick="openModal('${r.name}', ${r.tile_count})">${r.name}</td>
+                    <td class="tile-count">${r.tile_count}</td>
+                </tr>`).join('');
+
+            document.getElementById('content').innerHTML = `
+                <table>
+                    <thead>
+                        <tr><th>#</th><th>Room Name</th><th>Tiles</th></tr>
+                    </thead>
+                    <tbody>${tbody}</tbody>
+                </table>`;
+        }
+
+        function openModal(name, tiles) {
+            document.getElementById('modal-room-name').textContent = name;
+            document.getElementById('modal-tiles').textContent = tiles + ' tiles';
+            document.getElementById('modal-overlay').classList.add('open');
+        }
+
+        function closeModal() {
+            document.getElementById('modal-overlay').classList.remove('open');
+        }
+
+        document.getElementById('modal-overlay').addEventListener('click', function(e) {
+            if (e.target === this) closeModal();
+        });
+
+        document.getElementById('search').addEventListener('input', function(e) {
+            const q = e.target.value.toLowerCase();
+            const filtered = allRooms.filter(r => r.name.toLowerCase().includes(q));
+            renderTable(filtered);
+        });
+
+        loadRooms();
+    </script>
+</body>
+</html>

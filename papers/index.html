@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Papers | PurplePincher — Agent Infrastructure for the Open Web</title>
+    <style>
+        :root {
+            --bg: #0a0a0f;
+            --primary: #00d4ff;
+            --secondary: #7b2fff;
+            --text: #e0e0e0;
+            --accent: #00ff88;
+            --card-bg: #12121a;
+            --card-border: #2a2a3e;
+            --muted: #8888a0;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: system-ui, -apple-system, sans-serif;
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        /* Header */
+        header {
+            border-bottom: 1px solid var(--card-border);
+            padding: 1.5rem 2rem;
+        }
+
+        .header-inner {
+            max-width: 1100px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .brand-icon {
+            font-size: 2rem;
+        }
+
+        .brand-text h1 {
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+            letter-spacing: -0.02em;
+        }
+
+        .brand-text p {
+            font-size: 0.85rem;
+            color: var(--muted);
+            margin-top: 0.1rem;
+        }
+
+        nav {
+            display: flex;
+            gap: 2rem;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.9rem;
+        }
+
+        nav a {
+            color: var(--text);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        nav a:hover {
+            color: var(--primary);
+        }
+
+        nav a.active {
+            color: var(--primary);
+        }
+
+        /* Main */
+        main {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 2.5rem 2rem;
+        }
+
+        /* Stats Bar */
+        .stats-bar {
+            display: flex;
+            gap: 2rem;
+            padding: 1rem 1.5rem;
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 8px;
+            margin-bottom: 2.5rem;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.85rem;
+            flex-wrap: wrap;
+        }
+
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .stat-label {
+            color: var(--muted);
+        }
+
+        .stat-value {
+            color: var(--accent);
+        }
+
+        .live-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--accent);
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
+        }
+
+        /* Papers Section */
+        .papers-header {
+            margin-bottom: 2rem;
+        }
+
+        .papers-header h2 {
+            font-size: 1.25rem;
+            color: var(--secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            font-family: 'Courier New', Courier, monospace;
+        }
+
+        .papers-grid {
+            display: grid;
+            gap: 1.5rem;
+        }
+
+        .paper-card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 10px;
+            padding: 1.75rem;
+            transition: border-color 0.2s, transform 0.2s;
+        }
+
+        .paper-card:hover {
+            border-color: var(--primary);
+            transform: translateY(-2px);
+        }
+
+        .paper-meta {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 0.75rem;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.8rem;
+        }
+
+        .paper-lines {
+            color: var(--secondary);
+        }
+
+        .paper-read-link {
+            color: var(--primary);
+            text-decoration: none;
+            padding: 0.25rem 0.75rem;
+            border: 1px solid var(--primary);
+            border-radius: 4px;
+            font-size: 0.75rem;
+            transition: background 0.2s;
+        }
+
+        .paper-read-link:hover {
+            background: var(--primary);
+            color: var(--bg);
+        }
+
+        .paper-card h3 {
+            font-size: 1.35rem;
+            color: var(--primary);
+            margin-bottom: 0.75rem;
+        }
+
+        .paper-thesis {
+            color: var(--text);
+            margin-bottom: 1rem;
+            font-size: 0.95rem;
+            line-height: 1.7;
+        }
+
+        .paper-footer {
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        /* Footer */
+        footer {
+            border-top: 1px solid var(--card-border);
+            padding: 1.5rem 2rem;
+            margin-top: 3rem;
+        }
+
+        .footer-inner {
+            max-width: 1100px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+            font-size: 0.85rem;
+            color: var(--muted);
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 1.5rem;
+        }
+
+        .footer-links a {
+            color: var(--muted);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .footer-links a:hover {
+            color: var(--primary);
+        }
+
+        .footer-brand {
+            font-family: 'Courier New', Courier, monospace;
+        }
+
+        .footer-brand span {
+            color: var(--secondary);
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="header-inner">
+        <div class="brand">
+            <span class="brand-icon">🦀</span>
+            <div class="brand-text">
+                <h1>PurplePincher</h1>
+                <p>Agent Infrastructure for the Open Web</p>
+            </div>
+        </div>
+        <nav>
+            <a href="index.html" class="active">Papers</a>
+            <a href="../plato-library/index.html">PLATO Library</a>
+        </nav>
+    </div>
+</header>
+
+<main>
+    <div class="stats-bar">
+        <div class="stat-item">
+            <div class="live-dot"></div>
+            <span class="stat-label">PLATO Status:</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-label">Rooms:</span>
+            <span class="stat-value" id="rooms-count">—</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-label">Tiles:</span>
+            <span class="stat-value" id="tiles-count">—</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-label">Fleet FCI:</span>
+            <span class="stat-value" id="fleet-fci">—</span>
+        </div>
+    </div>
+
+    <section>
+        <div class="papers-header">
+            <h2>Research Papers</h2>
+        </div>
+
+        <div class="papers-grid">
+            <article class="paper-card">
+                <div class="paper-meta">
+                    <span class="paper-lines">111 lines</span>
+                    <a href="../repos/papers/compiled-agency.md" class="paper-read-link">Read Paper</a>
+                </div>
+                <h3>Compiled Agency</h3>
+                <p class="paper-thesis">
+                    Agency in a distributed fleet of AI agents is compiled, not interpreted. Like a compiler transforms high-level intent into machine code, the Cocapn keeper architecture transforms declarative knowledge into executable agency.
+                </p>
+                <div class="paper-footer">
+                    <a href="../repos/papers/compiled-agency.md" class="paper-read-link">Read Paper →</a>
+                </div>
+            </article>
+
+            <article class="paper-card">
+                <div class="paper-meta">
+                    <span class="paper-lines">135 lines</span>
+                    <a href="../repos/papers/bootstrap-bomb.md" class="paper-read-link">Read Paper</a>
+                </div>
+                <h3>Bootstrap Bomb</h3>
+                <p class="paper-thesis">
+                    The biggest barrier to deploying a multi-agent fleet isn't capability — it's bootstrapping. Cocapn treats bootstrapping as a bomb: you light the fuse once (Oracle1), and the explosion compiles the rest of the fleet automatically.
+                </p>
+                <div class="paper-footer">
+                    <a href="../repos/papers/bootstrap-bomb.md" class="paper-read-link">Read Paper →</a>
+                </div>
+            </article>
+
+            <article class="paper-card">
+                <div class="paper-meta">
+                    <span class="paper-lines">219 lines</span>
+                    <a href="../repos/papers/semantic-compiler.md" class="paper-read-link">Read Paper</a>
+                </div>
+                <h3>The Semantic Compiler</h3>
+                <p class="paper-thesis">
+                    The bottleneck in multi-agent systems isn't model capability — it's the translation layer between intent and execution. The semantic compiler is a new architectural layer that transforms agent intent (PLATO tiles) into verified, optimizable execution paths.
+                </p>
+                <div class="paper-footer">
+                    <a href="../repos/papers/semantic-compiler.md" class="paper-read-link">Read Paper →</a>
+                </div>
+            </article>
+        </div>
+    </section>
+</main>
+
+<footer>
+    <div class="footer-inner">
+        <div class="footer-links">
+            <a href="https://purplepincher.org" target="_blank">purplepincher.org</a>
+            <a href="https://github.com/SuperInstance" target="_blank">SuperInstance GitHub</a>
+            <a href="#" target="_blank">Crab-Trap Portal</a>
+        </div>
+        <div class="footer-brand">
+            <span>🦀</span> PurplePincher by <span>Cocapn</span>
+        </div>
+    </div>
+</footer>
+
+<script>
+    async function fetchPLATOStatus() {
+        try {
+            const res = await fetch('http://localhost:8847/room/oracle1_history');
+            if (res.ok) {
+                const data = await res.json();
+                document.getElementById('rooms-count').textContent = data.rooms?.length ?? '—';
+                document.getElementById('tiles-count').textContent = data.tiles?.length ?? '—';
+                document.getElementById('fleet-fci').textContent = data.fci ?? '—';
+            }
+        } catch (e) {
+            // PLATO not available, leave as —
+        }
+    }
+    fetchPLATOStatus();
+</script>
+
+</body>
+</html>
