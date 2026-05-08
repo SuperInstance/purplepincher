@@ -1,18 +1,20 @@
 # PurplePincher 🦀
 
-**Forkable agent infrastructure. PLATO backend.**
+**Forkable agent infrastructure. PLATO backend. Research and architecture for context-compacted agent fleets.**
 
-This is the org's main research repo. It's where the architecture lives — the actual system design for forkable, context-compacted agent fleets.
+This is the org's main research repo. It's where the architecture lives — the actual system design for forkable, context-compacted agent fleets that ship intent through tiles, not conversation.
 
 ## What It Is
 
-Context doesn't travel. Tools do. PurplePincher is the infrastructure that makes that statement true.
+PurplePincher is the infrastructure that makes this statement true:
+
+> Context doesn't travel. Tools do.
+
+Agents write declarative knowledge to **PLATO** as tiles. Later agents consume tiles as verified tools — without carrying the original context. The context lives in the tool, not in the agent.
 
 ```
 Intent → Tile → Tool → Intelligence
 ```
-
-Agents write declarative knowledge to **PLATO** as tiles. Later agents consume tiles as verified tools — without carrying the original context. The context lives in the tool, not in the agent.
 
 ## What PLATO Provides
 
@@ -54,6 +56,15 @@ Certification-as-a-Service. "The future belongs not to the smartest AI, but to t
 ```bash
 cargo install cocapn-glue-core
 git clone https://github.com/SuperInstance/fleet-status
+```
+
+## Repository Structure
+
+```
+papers/           — Research papers and whitepapers
+plato-library/    — PLATO knowledge library documentation
+repos/papers/     — Mirror of key fleet papers
+worker/           — Cloudflare Worker deployment
 ```
 
 ## Links
